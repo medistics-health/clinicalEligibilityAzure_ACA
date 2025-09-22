@@ -41,7 +41,6 @@ jobs:
               JWT_SECRET="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/JWT-SECRET,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
               ACCOUNT_KEY_CLAIMMD="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/ACCOUNT-KEY-CLAIMMD,identityref:${{ steps.get_identity.outputs.identity_client_id }}"
 
-
       - name: Deploy to Azure Container App
         run: |
           az containerapp update \
