@@ -27,6 +27,13 @@ jobs:
       - name: Push Docker image to ACR
         run: docker push ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
       
+      - name: Get ACA Managed Identity
+        id: get_identity
+        run: |
+          echo "identity_client_id=$(az containerapp show \
+            --name monolithic-clinical-app \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --query identity.principalId -o tsv)" >> $GITHUB_OUTPUT
       - name: Link Key Vault secrets to ACA
         run: |
           az containerapp secret set \
