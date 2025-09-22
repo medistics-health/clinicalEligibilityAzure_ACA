@@ -27,6 +27,10 @@ jobs:
       - name: Push Docker image to ACR
         run: docker push ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
       
+      - name: Upgrade Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
       - name: Set ACA secrets referencing Key Vault
         run: |
           az containerapp secret set \
