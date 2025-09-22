@@ -13,7 +13,7 @@ const pool = new Pool({
 
 const sequelize = new Sequelize("ClaimMd", process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
   host: process.env.DATABASE_HOST,
-  port: process.env.DATABASE_PORT, 
+  port: parseInt(process.env.DATABASE_PORT), 
   dialect: 'postgres',
   pool: {
     max: 25, // Maximum number of connections in pool
