@@ -30,7 +30,7 @@ jobs:
       - name: Link Key Vault secrets to ACA
         run: |
           az containerapp secret set \
-            --name ${{ secrets.CONTAINERAPP_NAME }} \
+            --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --secrets \
               DATABASE_USERNAME=keyvaultref:${{ secrets.KEYVAULT_NAME }}:DATABASE-USERNAME \
