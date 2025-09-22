@@ -34,7 +34,7 @@ jobs:
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
             --set-env-vars \
-              DATABASE_USERNAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-USERNAME \
+              DATABASE_USERNAME=secretref:monoclinicalkeyvault:DATABASE-USERNAME \
               DATABASE_PASSWORD=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PASSWORD \
               DATABASE_HOST=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-HOST
               DATABASE_PORT=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PORT
