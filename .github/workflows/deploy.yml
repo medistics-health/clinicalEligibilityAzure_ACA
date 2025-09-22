@@ -90,6 +90,14 @@ jobs:
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --yaml ./containerapp-config.yaml \
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
+            --set-env-vars \
+              DATABASE_USERNAME=database-username \
+              DATABASE_PASSWORD=sdatabase-password \
+              DATABASE_HOST=database-host \
+              DATABASE_PORT=database-port \
+              DATABASE_NAME=database-name \
+              JWT_SECRET=secretref:jwt-secret \
+              ACCOUNT_KEY_CLAIMMD=secretref:account-key-claimmd
       #- name: Deploy to ACA
       #   run: |
       #     az containerapp update \
