@@ -47,7 +47,7 @@ jobs:
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
-            --set-env-vars \
+            --environment-variables \
               DATABASE_USERNAME=database-username \
               DATABASE_PASSWORD=database-password \
               DATABASE_HOST=database-host \
