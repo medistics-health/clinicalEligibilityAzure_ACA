@@ -27,41 +27,69 @@ jobs:
       - name: Push Docker image to ACR
         run: docker push ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
       
-      - name: Get ACA Managed Identity
-        id: get_identity
+      - name: Create Container App config YAML with Key Vault secrets using User-Assigned Identity
         run: |
-          echo "identity_client_id=$(az containerapp show \
-            --name monolithic-clinical-app \
-            --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --query identity.principalId -o tsv)" >> $GITHUB_OUTPUT
-      - name: Link Key Vault secrets to ACA
-        run: |
-          az containerapp secret set \
-            --name monolithic-clinical-app \
-            --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --secrets \
-              database-username="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-USERNAME,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
-              database-password="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PASSWORD,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
-              database-host="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-HOST,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
-              database-port="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PORT,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
-              database-name="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-NAME,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
-              jwt-secret="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/JWT-SECRET,identityref:${{ steps.get_identity.outputs.identity_client_id }}" \
-              account-key-claimmd="keyvaultref:https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/ACCOUNT-KEY-CLAIMMD,identityref:${{ steps.get_identity.outputs.identity_client_id }}"
+          cat <<EOF > containerapp-config.yaml
+          secrets:
+            - name: database-username
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-USERNAME
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
 
-      - name: Deploy to Azure Container App
+            - name: database-password
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PASSWORD
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
+
+            - name: database-host
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-HOST
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
+
+            - name: database-port
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PORT
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
+
+            - name: database-name
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-NAME
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
+
+            - name: jwt-secret
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/JWT-SECRET
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
+
+            - name: account-key-claimmd
+              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/ACCOUNT-KEY-CLAIMMD
+              identity:
+                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
+
+          environmentVariables:
+            - name: DATABASE_USERNAME
+              secretRef: database-username
+            - name: DATABASE_PASSWORD
+              secretRef: database-password
+            - name: DATABASE_HOST
+              secretRef: database-host
+            - name: DATABASE_PORT
+              secretRef: database-port
+            - name: DATABASE_NAME
+              secretRef: database-name
+            - name: JWT_SECRET
+              secretRef: jwt-secret
+            - name: ACCOUNT_KEY_CLAIMMD
+              secretRef: account-key-claimmd
+          EOF
+
+      - name: Deploy Container App with updated config and new image
         run: |
           az containerapp update \
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
-            --set-env-vars \
-              DATABASE_USERNAME=database-username \
-              DATABASE_PASSWORD=database-password \
-              DATABASE_HOST=database-host \
-              DATABASE_PORT=database-port \
-              DATABASE_NAME=database-name \
-              JWT_SECRET=jwt-secret \
-              ACCOUNT_KEY_CLAIMMD=account-key-claimmd
+            --yaml ./containerapp-config.yaml \
+            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
       #- name: Deploy to ACA
       #   run: |
       #     az containerapp update \
