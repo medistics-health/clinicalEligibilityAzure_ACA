@@ -89,7 +89,7 @@ jobs:
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --yaml ./containerapp-config.yaml \
-            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
+            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
             --set-env-vars \
               DATABASE_USERNAME=database-username \
               DATABASE_PASSWORD=sdatabase-password \
