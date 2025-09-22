@@ -62,7 +62,7 @@ jobs:
               DATABASE_NAME=database-name \
               JWT_SECRET=jwt-secret \
               ACCOUNT_KEY_CLAIMMD=account-key-claimmd
-      ##- name: Deploy to ACA
+      #- name: Deploy to ACA
       #   run: |
       #     az containerapp update \
             
