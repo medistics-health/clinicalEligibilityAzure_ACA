@@ -37,7 +37,7 @@ app.use("/r/Insuranceeligibility", claimMD);
 app.route("/r/login").post(loginRouter.login);
 app.route("/r/register").post(loginRouter.register);
 app.route("/r/register").put(loginRouter.updateNpi);
-// syncModels();xa
+// syncModels()
 
 // Function to decode base64-encoded password
 async function hashPassword(password) {
