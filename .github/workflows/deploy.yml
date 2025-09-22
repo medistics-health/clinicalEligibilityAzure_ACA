@@ -32,4 +32,12 @@ jobs:
           az containerapp update \
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
+            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
+            --set-env-vars \
+              DATABASE_USERNAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-USERNAME \
+              DATABASE_PASSWORD=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PASSWORD \
+              DATABASE_HOST=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-HOST
+              DATABASE_PORT=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PORT
+              DATABASE_NAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-NAME
+              JWT_SECRET=secretref:${{ secrets.KEYVAULT_NAME }}:JWT-SECRET
+              ACCOUNT_KEY_CLAIMMD=secretref:${{ secrets.KEYVAULT_NAME }}:ACCOUNT-KEY-CLAIMMD
