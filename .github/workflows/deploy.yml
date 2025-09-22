@@ -47,14 +47,14 @@ jobs:
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
-            --environment-variables \
-              DATABASE_USERNAME=database-username \
-              DATABASE_PASSWORD=database-password \
-              DATABASE_HOST=database-host \
-              DATABASE_PORT=database-port \
-              DATABASE_NAME=database-name \
-              JWT_SECRET=jwt-secret \
-              ACCOUNT_KEY_CLAIMMD=account-key-claimmd
+            --env-vars \
+              DATABASE_USERNAME=secretref:database-username \
+              DATABASE_PASSWORD=secretref:database-password \
+              DATABASE_HOST=secretref:database-host \
+              DATABASE_PORT=secretref:database-port \
+              DATABASE_NAME=secretref:database-name \
+              JWT_SECRET=secretref:jwt-secret \
+              ACCOUNT_KEY_CLAIMMD=secretref:account-key-claimmd
       #- name: Deploy to ACA
       #   run: |
       #     az containerapp update \
