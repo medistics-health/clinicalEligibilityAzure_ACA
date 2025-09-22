@@ -27,62 +27,18 @@ jobs:
       - name: Push Docker image to ACR
         run: docker push ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
       
-      - name: Create Container App config YAML with Key Vault secrets using User-Assigned Identity
+      - name: Set ACA secrets referencing Key Vault
         run: |
-          cat <<EOF > containerapp-config.yaml
-          secrets:
-            - name: database-username
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-USERNAME
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-            - name: database-password
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PASSWORD
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-            - name: database-host
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-HOST
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-            - name: database-port
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PORT
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-            - name: database-name
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-NAME
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-            - name: jwt-secret
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/JWT-SECRET
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-            - name: account-key-claimmd
-              keyVaultUrl: https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/ACCOUNT-KEY-CLAIMMD
-              identity:
-                userAssignedIdentity: /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP }}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/clinical-app-identity
-
-          environmentVariables:
-            - name: DATABASE_USERNAME
-              secretRef: database-username
-            - name: DATABASE_PASSWORD
-              secretRef: database-password
-            - name: DATABASE_HOST
-              secretRef: database-host
-            - name: DATABASE_PORT
-              secretRef: database-port
-            - name: DATABASE_NAME
-              secretRef: database-name
-            - name: JWT_SECRET
-              secretRef: jwt-secret
-            - name: ACCOUNT_KEY_CLAIMMD
-              secretRef: account-key-claimmd
-          EOF
-
+          az containerapp secret set \
+            --name monolithic-clinical-app \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --secrets database-username=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-USERNAME) \
+                      database-password=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PASSWORD) \
+                      database-host=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-HOST) \
+                      database-port=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PORT) \
+                      database-name=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-NAME) \
+                      jwt-secret=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/JWT-SECRET) \
+                      account-key-claimmd=@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/ACCOUNT-KEY-CLAIMMD)
       - name: Deploy Container App with updated config and new image
         run: |
           echo database-username
