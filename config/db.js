@@ -8,7 +8,7 @@ const pool = new Pool({
     host: process.env.DATABASE_HOST,
     database: 'ClaimMd',
     password: process.env.DATABASE_PASSWORD,//'12345',
-    port: process.env.DATABASE_PORT,
+    port: parseInt(process.env.DATABASE_PORT),
 });
 
 const sequelize = new Sequelize("ClaimMd", process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
