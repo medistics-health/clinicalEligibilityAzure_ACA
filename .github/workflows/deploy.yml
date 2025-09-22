@@ -26,18 +26,46 @@ jobs:
 
       - name: Push Docker image to ACR
         run: docker push ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
+      
+      - name: Link Key Vault secrets to ACA
+        run: |
+          az containerapp secret set \
+            --name ${{ secrets.CONTAINERAPP_NAME }} \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --secrets \
+              DATABASE_USERNAME=keyvaultref:${{ secrets.KEYVAULT_NAME }}:DATABASE-USERNAME \
+              DATABASE_PASSWORD=keyvaultref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PASSWORD \
+              DATABASE_HOST=keyvaultref:${{ secrets.KEYVAULT_NAME }}:DATABASE-HOST \
+              DATABASE_PORT=keyvaultref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PORT \
+              DATABASE_NAME=keyvaultref:${{ secrets.KEYVAULT_NAME }}:DATABASE-NAME \
+              JWT_SECRET=keyvaultref:${{ secrets.KEYVAULT_NAME }}:JWT-SECRET \
+              ACCOUNT_KEY_CLAIMMD=keyvaultref:${{ secrets.KEYVAULT_NAME }}:ACCOUNT-KEY-CLAIMMD
 
-      - name: Deploy to ACA
+      - name: Deploy to Azure Container App
         run: |
           az containerapp update \
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
             --set-env-vars \
-              DATABASE_USERNAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-USERNAME \
-              DATABASE_PASSWORD=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PASSWORD \
-              DATABASE_HOST=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-HOST \
-              DATABASE_PORT=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PORT \
-              DATABASE_NAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-NAME \
-              JWT_SECRET=secretref:${{ secrets.KEYVAULT_NAME }}:JWT-SECRET \
-              ACCOUNT_KEY_CLAIMMD=secretref:${{ secrets.KEYVAULT_NAME }}:ACCOUNT-KEY-CLAIMMD
+              DATABASE_USERNAME=DATABASE_USERNAME \
+              DATABASE_PASSWORD=DATABASE_PASSWORD \
+              DATABASE_HOST=DATABASE_HOST \
+              DATABASE_PORT=DATABASE_PORT \
+              DATABASE_NAME=DATABASE_NAME \
+              JWT_SECRET=JWT_SECRET \
+              ACCOUNT_KEY_CLAIMMD=ACCOUNT_KEY_CLAIMMD
+      # - name: Deploy to ACA
+      #   run: |
+      #     az containerapp update \
+            
+      #       --resource-group ${{ secrets.RESOURCE_GROUP }} \
+      #       --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
+      #       --set-env-vars \
+      #         DATABASE_USERNAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-USERNAME \
+      #         DATABASE_PASSWORD=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PASSWORD \
+      #         DATABASE_HOST=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-HOST \
+      #         DATABASE_PORT=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-PORT \
+      #         DATABASE_NAME=secretref:${{ secrets.KEYVAULT_NAME }}:DATABASE-NAME \
+      #         JWT_SECRET=secretref:${{ secrets.KEYVAULT_NAME }}:JWT-SECRET \
+      #         ACCOUNT_KEY_CLAIMMD=secretref:${{ secrets.KEYVAULT_NAME }}:ACCOUNT-KEY-CLAIMMD
