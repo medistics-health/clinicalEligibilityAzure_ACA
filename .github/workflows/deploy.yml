@@ -1,5 +1,5 @@
 name: Build and Deploy to ACA
-#deployment file
+
 on:
   push:
     branches:
@@ -30,6 +30,6 @@ jobs:
       - name: Deploy to ACA
         run: |
           az containerapp update \
-            --name monolithic-app \
+            --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolithic-app:${{ github.sha }}
+            --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
