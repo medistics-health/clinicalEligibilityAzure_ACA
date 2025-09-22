@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const pool = require("./config/db"); // Import the database connection
+const pool = require("./config/db"); // Import the database connections
 const jwt = require("jsonwebtoken");
 const { generateToken, verifyToken } = require("./config/token"); // Import the stoken generation functions
 const claimMD = require("./controllers/ClaimMDInsert");
