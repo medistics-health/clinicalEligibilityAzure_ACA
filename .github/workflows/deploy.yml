@@ -34,7 +34,7 @@ jobs:
       - name: Set ACA secrets referencing Key Vault
         run: |
           DB_PASSWORD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PASSWORD --query value -o tsv)
-          echo "DB Password is $DB_PASSWORD"
+          echo "DB Password dddd is $DB_PASSWORD"
           az containerapp secret set \
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
