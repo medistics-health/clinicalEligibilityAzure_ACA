@@ -55,7 +55,7 @@ jobs:
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
             --set-env-vars \
               DATABASE_USERNAME=secretref:database-username \
-              DATABASE_PASSWORD=secretref:database-password \
+              DATABASE_PASSWORD=$DB_PASSWORD \
               DATABASE_HOST=secretref:database-host \
               DATABASE_PORT=secretref:database-port \
               DATABASE_NAME=secretref:database-name \
