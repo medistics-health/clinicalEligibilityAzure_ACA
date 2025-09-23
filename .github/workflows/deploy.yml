@@ -30,12 +30,12 @@ jobs:
       - name: ACA secrets referencing Key Vault
         run: |
           echo "DB_PASSWORD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PASSWORD --query value -o tsv)" >> $GITHUB_ENV
-          echo "DATABASE-USERNAME=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-USERNAME --query value -o tsv)" >> $GITHUB_ENV
-          echo "DATABASE-HOST=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-HOST --query value -o tsv)" >> $GITHUB_ENV
-          echo "DATABASE-PORT=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PORT --query value -o tsv)" >> $GITHUB_ENV
-          echo "DATABASE-NAME=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-NAME --query value -o tsv)" >> $GITHUB_ENV
-          echo "JWT-SECRET=$(az keyvault secret show --vault-name monoclinicalkeyvault --name JWT-SECRET --query value -o tsv)" >> $GITHUB_ENV
-          echo "ACCOUNT-KEY-CLAIMMD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name ACCOUNT-KEY-CLAIMMD --query value -o tsv)" >> $GITHUB_ENV
+          echo "DATABASE_USERNAME=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-USERNAME --query value -o tsv)" >> $GITHUB_ENV
+          echo "DATABASE_HOST=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-HOST --query value -o tsv)" >> $GITHUB_ENV
+          echo "DATABASE_PORT=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PORT --query value -o tsv)" >> $GITHUB_ENV
+          echo "DATABASE_NAME=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-NAME --query value -o tsv)" >> $GITHUB_ENV
+          echo "JWT_SECRET=$(az keyvault secret show --vault-name monoclinicalkeyvault --name JWT-SECRET --query value -o tsv)" >> $GITHUB_ENV
+          echo "ACCOUNT_KEY_CLAIMMD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name ACCOUNT-KEY-CLAIMMD --query value -o tsv)" >> $GITHUB_ENV
 
       - name: Deploy Container App with updated config and new image
         run: |
@@ -44,10 +44,10 @@ jobs:
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --image ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }} \
             --set-env-vars \
-              DATABASE_USERNAME=$DATABASE-USERNAME \
+              DATABASE_USERNAME=$DATABASE_USERNAME \
               DATABASE_PASSWORD=$DB_PASSWORD \
-              DATABASE_HOST=$DATABASE-HOST \
-              DATABASE_PORT=$DATABASE-PORT \
-              DATABASE_NAME=$DATABASE-NAME \
-              JWT_SECRET=$JWT-SECRET \
-              ACCOUNT_KEY_CLAIMMD=$ACCOUNT-KEY-CLAIMMD
+              DATABASE_HOST=$DATABASE_HOST \
+              DATABASE_PORT=$DATABASE_PORT \
+              DATABASE_NAME=$DATABASE_NAME \
+              JWT_SECRET=$JWT_SECRET \
+              ACCOUNT_KEY_CLAIMMD=$ACCOUNT_KEY_CLAIMMD
