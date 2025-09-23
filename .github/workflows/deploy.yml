@@ -33,11 +33,13 @@ jobs:
 
       - name: Set ACA secrets referencing Key Vault
         run: |
+          DB_PASSWORD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PASSWORD --query value -o tsv)
+          echo "DB Password is $DB_PASSWORD"
           az containerapp secret set \
             --name monolithic-clinical-app \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --secrets \
-              database-username=`@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-USERNAME)` \
+              database-username="@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-USERNAME)" \
               database-password="@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PASSWORD)" \
               database-host="@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-HOST)" \
               database-port="@Microsoft.KeyVault(SecretUri=https://${{ secrets.KEYVAULT_NAME }}.vault.azure.net/secrets/DATABASE-PORT)" \
