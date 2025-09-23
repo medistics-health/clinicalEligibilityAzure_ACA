@@ -26,14 +26,10 @@ jobs:
 
       - name: Push Docker image to ACR
         run: docker push ${{ secrets.REGISTRY_SERVER }}.azurecr.io/monolith-app:${{ github.sha }}
-      
-      - name: Upgrade Azure CLI
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
       - name: Set ACA secrets referencing Key Vault
         run: |
-          DB_PASSWORD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PASSWORD --query value -o tsv)
+          echo "DB_PASSWORD=$(az keyvault secret show --vault-name monoclinicalkeyvault --name DATABASE-PASSWORD --query value -o tsv)" >> $GITHUB_ENV
           echo "DB Password dddd is $DB_PASSWORD"
           az containerapp secret set \
             --name monolithic-clinical-app \
