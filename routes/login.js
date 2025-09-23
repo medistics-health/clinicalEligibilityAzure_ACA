@@ -15,7 +15,6 @@ async function login(req, res) {
 	const { email, password } = req.body;
 	try {
 		const user = await MasterUser.findOne({ where: { email } });
-		console.log("=============",process.env.JWT_SECRET,DATABASE_HOST);
 		if (!user) {
 		  return res.status(401).json({ message: 'Invalid email or password' });
 		}
